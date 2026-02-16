@@ -1,0 +1,15 @@
+backend/
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+.venv/
+InsurancePremium.ipynb
+insurance.csv
+start.sh
+start_backend.sh
+start_backend.bat
+

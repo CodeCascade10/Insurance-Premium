@@ -1,0 +1,7 @@
+fastapi
+mangum
+scikit-learn
+joblib
+numpy
+pydantic
+
