@@ -109,5 +109,28 @@ async def predict_premium(input_data: InsuranceInput):
 
 # Vercel serverless function handler
 from mangum import Mangum
-handler = Mangum(app)
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.requests import Request
+
+# Middleware to strip /api prefix from incoming requests
+# When Vercel routes /api/* to this function, the path may include /api
+# This middleware ensures FastAPI routes match correctly
+class StripAPIPrefixMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        # Check if path starts with /api and strip it
+        if request.url.path.startswith("/api"):
+            # Create a new request with modified path
+            scope = request.scope.copy()
+            scope["path"] = request.url.path[4:] or "/"  # Remove "/api", default to "/"
+            # Update path_info as well
+            scope["path_info"] = scope["path"]
+            # Create new request with modified scope
+            request = Request(scope, request.receive)
+        return await call_next(request)
+
+# Add middleware to strip /api prefix
+app.add_middleware(StripAPIPrefixMiddleware)
+
+# Create Mangum handler for Vercel
+handler = Mangum(app, lifespan="off")
 
